@@ -1,11 +1,8 @@
 const express = require('express');
+const placeController = require('../controller/placeController');
 
 const router = express.Router();
 
-router.route('/').get(async (req, res, next) => {
-  res.status(200).json({
-    status: 'success GCP',
-  });
-});
+router.route('/').get(placeController.getTour);
 
 module.exports = router;
