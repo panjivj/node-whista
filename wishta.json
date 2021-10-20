@@ -3,7 +3,7 @@
     "info": {
         "title": "Wishta RESTfull API",
         "version": "1",
-        "description": "Open Api for Wishta RESTfull API",
+        "description": "Open Api for Wishta App RESTfull API",
         "termsOfService": "https://kanda.fun",
         "contact": {
             "name": "Daniel Jayasutra",
@@ -80,21 +80,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "minLength": 10,
-                                        "maxLength": 150,
-                                        "required": true
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "minLength": 10,
-                                        "maxLength": 10000,
-                                        "required": true
-                                    }
-                                }
+                                "$ref": "#/components/schemas/create-tour"
                             }
                         }
                     }
@@ -124,6 +110,94 @@
                     }
                 ],
                 "responses": {}
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "create-tour":  {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 150,
+                        "required": true
+                    },
+                    "summary": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 300,
+                        "required": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 10000,
+                        "required": true
+                    },
+                    "image-thumbnail": {
+                        "type": "string",
+                        "required": true
+                    },
+                    "start-date": {
+                        "type": "string",
+                        "required": false
+                    },
+                    "end-date": {
+                        "$ref": "#/components/schemas/create-tour/properties/end-date"
+                    },
+                    "inclusions": {
+                        "type": "array",
+                        "required": false,
+                        "minItems": 1,
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                        }
+                    },
+                    "exclusions": {
+                        "$ref": "#/components/schemas/create-tour/properties/inclusions"
+                    },
+                    "additional-information": {
+                        "$ref": "#/components/schemas/create-tour/properties/inclusions"
+                    },
+                    "departure-details": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 500,
+                        "required": false
+                    },
+                    "return-details": {
+                        "$ref": "#/components/schemas/create-tour/properties/departure-details"
+                    },
+                    "max-group-size": {
+                        "type": "number",
+                        "required": true,
+                        "minimum": 1
+                    },
+                    "price": {
+                        "type": "number",
+                        "required": true,
+                        "minimum": 1
+                    },
+                    "price-discount": {
+                        "type": "number",
+                        "required": false,
+                        "minimum": 1
+                    },
+                    "image-photos": {
+                        "type": "array",
+                        "required": false,
+                        "minItems": 1,
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 300
+                        }
+                    }
+                }
             }
         }
     }
