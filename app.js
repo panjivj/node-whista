@@ -7,7 +7,7 @@ app.use(morgan('dev'));
 
 app.use(express.json({ limit: '20kb' }));
 
-app.use(`${process.env.API_VERSION}/place`, placeController);
+app.use(`${process.env.API_VERSION}/places`, placeController);
 // app.use('/api/v1/users');
 // app.use('/api/v1/reviews');
 

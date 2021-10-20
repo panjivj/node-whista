@@ -1,0 +1,130 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Wishta RESTfull API",
+        "version": "1",
+        "description": "Open Api for Wishta RESTfull API",
+        "termsOfService": "https://kanda.fun",
+        "contact": {
+            "name": "Daniel Jayasutra",
+            "email": "danieljayasutra@gmail.com",
+            "url": "https://kanda.fun"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        }
+    },
+    "servers": [
+        {
+            "description": "Wishta Restfull API Server",
+            "url": "https://{environment}.wishta.kanda.fun/api/v1",
+            "variables": {
+                "environment": {
+                    "default": "dev",
+                    "enum": [
+                        "dev",
+                        "qa",
+                        "prod"
+                    ]
+                }
+            }
+        }
+    ],
+    "externalDocs": {
+        "url": "https://postmain.com"
+    },
+    "paths": {
+        "/tour": {
+            "get": {
+                "tags": [
+                    "Tour"
+                ],
+                "summary": "Get all tour",
+                "description": "Get all available tour",
+                "parameters": [
+                    {
+                        "name": "include_done",
+                        "in": "query",
+                        "required": false,
+                        "description": "Is include done todolist",
+                        "schema": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "default": false
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "description": "Filter todolist by name",
+                        "schema": {
+                            "type": "string",
+                            "nullable": true,
+                            "minLength": 1,
+                            "maxLength": 100
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "tags": [
+                    "Tour"
+                ],
+                "summary": "Create new tour",
+                "description": "Create new tour and save to database",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "minLength": 10,
+                                        "maxLength": 150,
+                                        "required": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "minLength": 10,
+                                        "maxLength": 10000,
+                                        "required": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {}
+            }
+        },
+        "/tour/{tourId}": {
+            "get": {
+                "tags": [
+                    "Tour"
+                ],
+                "summary": "Get tour by id",
+                "description": "Get tour by tour id",
+                "parameters": [
+                    {
+                        "name": "tourId",
+                        "in": "path",
+                        "required": true,
+                        "description": "Tour id to get tour",
+                        "schema": {
+                            "type": "string",
+                            "nullable": false,
+                            "minLength": 1,
+                            "maxLength": 100
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    }
+}
