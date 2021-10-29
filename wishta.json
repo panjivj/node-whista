@@ -227,7 +227,7 @@
                         "required": false
                     },
                     "end-date": {
-                        "$ref": "#/components/schemas/create-tour/properties/end-date"
+                        "$ref": "#/components/schemas/create-tour/properties/start-date"
                     },
                     "inclusions": {
                         "type": "array",

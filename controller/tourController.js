@@ -1,4 +1,4 @@
-const Place = require('../models/placeModel');
+const Tour = require('../models/tourModel');
 
 exports.getTour = (req, res, next) => {
   res.status(200).json({
@@ -8,7 +8,7 @@ exports.getTour = (req, res, next) => {
 
 exports.createTour = async (req, res, next) => {
   try {
-    const place = await Place.create(req.body);
+    const place = await Tour.create(req.body);
 
     res.status(200).json({
       data: place,
