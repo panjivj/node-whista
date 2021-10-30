@@ -14,14 +14,17 @@ const tourSchema = new mongoose.Schema({
     required: [true, 'A tour mus have a summary'],
     trim: true,
     maxlength: [300, 'A tour summary must have less or equal then 300 characters'],
-    minlength: [10, 'A tour summary must have more or equal then 8 characters '],
+    minlength: [10, 'A tour summary must have more or equal then 10 characters '],
   },
   description: {
     type: String,
-    required: [true, 'A tour must have descriptions'],
+    required: [true, 'A tour must have description'],
     trim: true,
-    maxlength: [10000, 'A tour summary must have less or equal then 10000 characters'],
-    minlength: [10, 'A tour summary must have more or equal then 10 characters '],
+    maxlength: [
+      10000,
+      'A tour description must have less or equal then 10000 characters',
+    ],
+    minlength: [10, 'A tour description must have more or equal then 10 characters '],
   },
   imageThumbnail: {
     type: String,
@@ -46,17 +49,23 @@ const tourSchema = new mongoose.Schema({
   },
   departureDetails: {
     type: String,
-    maxlength: [500, 'A tour summary must have less or equal then 500 characters'],
-    minlength: [10, 'A tour summary must have more or equal then 10 characters '],
+    maxlength: [
+      500,
+      'A tour departure details must have less or equal then 500 characters',
+    ],
+    minlength: [
+      10,
+      'A tour departure details must have more or equal then 10 characters ',
+    ],
   },
   returnDetails: {
     type: String,
-    maxlength: [500, 'A tour summary must have less or equal then 500 characters'],
-    minlength: [10, 'A tour summary must have more or equal then 10 characters '],
+    maxlength: [500, 'A tour return details must have less or equal then 500 characters'],
+    minlength: [10, 'A tour return details must have more or equal then 10 characters '],
   },
   maxGroupSize: {
     type: Number,
-    required: [true, 'A tour must have number'],
+    required: [true, 'A tour must have max group size'],
     min: [1, 'max group size must be have less or equal 1'],
   },
   price: {

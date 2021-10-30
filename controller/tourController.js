@@ -1,9 +1,13 @@
 const Tour = require('../models/tourModel');
 
-exports.getTour = (req, res, next) => {
-  res.status(200).json({
-    status: 'OK place',
-  });
+exports.getTours = async (req, res, next) => {
+  const tours = await Tour.find();
+  res.status(200).json(tours);
+};
+
+exports.getTourById = async (req, res, next) => {
+  const tour = await Tour.findById(req.params.tourId);
+  res.status(200).json({ tour });
 };
 
 exports.createTour = async (req, res, next) => {
@@ -19,3 +23,5 @@ exports.createTour = async (req, res, next) => {
     });
   }
 };
+
+exports.patchTour = async (req, res, next) => {};
