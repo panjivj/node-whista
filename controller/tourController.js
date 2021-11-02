@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const factory = require('./factoryController');
 
 exports.getTours = async (req, res, next) => {
   const tours = await Tour.find();
@@ -10,19 +11,13 @@ exports.getTourById = async (req, res, next) => {
   res.status(200).json({ tour });
 };
 
-exports.createTour = async (req, res, next) => {
-  try {
-    const place = await Tour.create(req.body);
-
-    res.status(200).json({
-      data: place,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: error,
-    });
-  }
-};
+// exports.createTour = catchAsync(async (req, res, next) => {
+//   const place = await Tour.create(req.body);
+//   res.status(200).json({
+//     data: place,
+//   });
+// });
+exports.createTour = factory.create(Tour);
 
 exports.patchTour = async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.tourId, req.body, {
