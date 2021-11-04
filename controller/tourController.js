@@ -6,10 +6,10 @@ exports.getTours = async (req, res, next) => {
   res.status(200).json(tours);
 };
 
-exports.getTourById = async (req, res, next) => {
-  const tour = await Tour.findById(req.params.tourId);
-  res.status(200).json({ tour });
-};
+// exports.getTourById = async (req, res, next) => {
+//   const tour = await Tour.findById(req.params.tourId);
+//   res.status(200).json({ tour });
+// };
 
 // exports.createTour = catchAsync(async (req, res, next) => {
 //   const place = await Tour.create(req.body);
@@ -19,6 +19,7 @@ exports.getTourById = async (req, res, next) => {
 // });
 exports.createTour = factory.create(Tour);
 exports.deleteTour = factory.deleteById(Tour);
+exports.getTour = factory.getOneById(Tour);
 
 exports.patchTour = async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.tourId, req.body, {
