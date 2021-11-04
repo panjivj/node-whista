@@ -18,6 +18,7 @@ exports.getTourById = async (req, res, next) => {
 //   });
 // });
 exports.createTour = factory.create(Tour);
+exports.deleteTour = factory.deleteById(Tour);
 
 exports.patchTour = async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.tourId, req.body, {
@@ -27,9 +28,9 @@ exports.patchTour = async (req, res, next) => {
   res.status(200).json(tour);
 };
 
-exports.deleteTour = async (req, res, next) => {
-  // const tour = await Tour.findOneAndDelete(req.params.tourId);
-  const tour = await Tour.findByIdAndDelete(req.params.tourId);
-  console.log(tour);
-  res.status(200).json(tour);
-};
+// exports.deleteTour = async (req, res, next) => {
+//   // const tour = await Tour.findOneAndDelete(req.params.tourId);
+//   const tour = await Tour.findByIdAndDelete(req.params.tourId);
+//   console.log(tour);
+//   res.status(200).json(tour);
+// };
