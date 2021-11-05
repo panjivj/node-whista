@@ -7,7 +7,7 @@ const castErrorDb = (err) => {
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
-    err: err,
+    ...err,
     message: err.message,
     stack: err.stack,
   });
@@ -21,7 +21,7 @@ const sendErrorProd = (err, res) => {
     });
   } else {
     res.status(500).json({
-      status: 'Error',
+      status: 'error',
       message: 'Something went wrong !',
     });
   }
@@ -30,7 +30,7 @@ const sendErrorProd = (err, res) => {
 module.exports = (err, req, res, next) => {
   // if the error object has no statuscode & status
   err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'Fail';
+  err.status = err.status || 'fail';
 
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
