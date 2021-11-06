@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const AppError = require('./helper/AppError');
 const tourRouter = require('./routers/tourRouter');
+const userRouter = require('./routers/userRouter');
+const reviewRouter = require('./routers/reviewRouter');
 const errorHandler = require('./helper/errorHandler');
 
 const app = express();
@@ -16,7 +18,8 @@ app.use('/status', (req, res) => {
 });
 
 app.use(`${process.env.API_VERSION}/tour`, tourRouter);
-// app.use('/api/v1/users');
+app.use(`${process.env.API_VERSION}/user`, userRouter);
+app.use(`${process.env.API_VERSION}/review`, reviewRouter);
 // app.use('/api/v1/reviews');
 
 app.all('*', (req, res, next) => {

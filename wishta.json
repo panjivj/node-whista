@@ -174,9 +174,9 @@
                 }
             }
         },
-        "/users": {
+        "/user": {
             "post": {
-                "tags": ["Users"],
+                "tags": ["User"],
                 "summary": "Create new user",
                 "description": "Create new user and save to database",
                 "requestBody": {
@@ -184,7 +184,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/create-users"
+                                "$ref": "#/components/schemas/create-user"
                             }
                         }
                     }                   
@@ -316,7 +316,7 @@
                     }
                 }
             },
-            "create-users": {
+            "create-user": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -333,6 +333,12 @@
                     },
                     "password": {
                         "type": "string",
+                        "minLength": 8,
+                        "maxLength": 100,
+                        "required": true
+                    },
+                    "passwordConfirm": {
+                        "type": "string",
                         "minLength": 2,
                         "maxLength": 100,
                         "required": true
@@ -342,6 +348,10 @@
                         "minLength": 2,
                         "maxLength": 10,
                         "required": true
+                    },
+                    "photoProfile": {
+                        "type": "string",
+                        "maxLength":1000
                     }
                 }
             }

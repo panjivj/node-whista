@@ -1,5 +1,5 @@
 const AppError = require('../helper/AppError');
-const catchAsync = require('../helper/catchAsync');
+const { catchAsync } = require('../helper/catchAsync');
 
 const response = (res, doc, statusCode) => {
   res.status(statusCode).json({

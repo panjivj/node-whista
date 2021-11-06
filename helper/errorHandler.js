@@ -5,6 +5,10 @@ const castErrorDb = (err) => {
   return new AppError(message, 400);
 };
 
+// const validatorError = (err) => {
+//   const message
+// }
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     ...err,
