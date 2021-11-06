@@ -8,6 +8,8 @@ const response = (res, doc, statusCode) => {
   });
 };
 
+exports.res = response;
+
 exports.create = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.create(req.body);
