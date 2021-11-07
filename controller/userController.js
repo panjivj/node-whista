@@ -22,12 +22,12 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm)
     return next(
       new AppError(
-        'This route is not for password update, Please remove password field',
+        'This route is not for password update, Please remove password & password confirm field',
         400,
       ),
     );
 
-  // only need field name and email
+  // only update field name and email
   const filters = filterObj(req.body, 'name', 'email');
   const doc = await User.findByIdAndUpdate(req.params.id, filters, {
     new: true,

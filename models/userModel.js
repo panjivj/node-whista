@@ -3,7 +3,7 @@ const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
   name: {
-    type: 'string',
+    type: String,
     minLength: [2, 'User name mush have more or equal then 2 characters'],
     maxLength: [100, 'User name mush have more or equal then 100 characters'],
     required: [true, 'User must have a name'],
@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
   email: {
-    type: 'string',
+    type: String,
     minLength: [2, 'User email mush have more or equal then 2 characters'],
     maxLength: [100, 'User email mush have more or equal then 100 characters'],
     required: [true, 'User must have a email'],
@@ -20,30 +20,43 @@ const userSchema = new mongoose.Schema({
     validate: [validator.isEmail, 'User mail badly formatted'],
   },
   password: {
-    type: 'string',
+    type: String,
     minLength: [8, 'User password mush have more or equal then 8 characters'],
     maxLength: [100, 'User password mush have more or equal then 100 characters'],
     required: [true, 'User must have a password'],
     trim: true,
+    select: false,
   },
   passwordConfirm: {
-    type: 'string',
+    type: String,
     minLength: [8, 'User passwordConfirm mush have more or equal then 8 characters'],
     maxLength: [100, 'User passwordConfirm mush have more or equal then 100 characters'],
     required: [true, 'User must have a passwordConfirm'],
     trim: true,
+    select: false,
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: 'password and passwordConfirm must be the same',
+    },
   },
   role: {
-    type: 'string',
+    type: String,
     minLength: [2, 'User role mush have more or equal then 8 characters'],
     maxLength: [100, 'User role mush have more or equal then 100 characters'],
     required: [true, 'User must have a role'],
     trim: true,
   },
   photoProfile: {
-    type: 'string',
+    type: String,
     maxLength: 1000,
     trim: true,
+  },
+  status: {
+    type: Boolean,
+    default: true,
+    select: false,
   },
 });
 
