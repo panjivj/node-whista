@@ -43,10 +43,9 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    minLength: [2, 'User role mush have more or equal then 8 characters'],
-    maxLength: [100, 'User role mush have more or equal then 100 characters'],
+    enum: ['user', 'guide', 'admin'],
+    default: 'user',
     required: [true, 'User must have a role'],
-    trim: true,
   },
   photoProfile: {
     type: String,
