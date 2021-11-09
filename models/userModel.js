@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     select: false,
     validate: {
+      // only works on CREATE and SAVE
       validator: function (el) {
         return el === this.password;
       },

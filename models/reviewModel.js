@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const tourModel = require('./tourModel');
+const userModel = require('./userModel');
 
 const reviewSchema = new mongoose.Schema({
   title: {
@@ -20,16 +22,28 @@ const reviewSchema = new mongoose.Schema({
     required: [true, 'Review must have a rating'],
   },
   tour: {
-    type: String,
-    minLength: [2, 'Review tour mush have more or equal then 2 characters'],
-    maxLength: [100, 'Review tour mush have more or equal then 100 characters'],
+    type: mongoose.Schema.ObjectId,
+    ref: 'Tour',
     required: [true, 'Review must have a tour'],
+    validate: {
+      // check tour exist or not
+      validator: function (el) {
+        return tourModel.exists({ _id: el });
+      },
+      message: 'Tour ID not found ',
+    },
   },
   user: {
-    type: String,
-    minLength: [2, 'Review user mush have more or equal then 2 characters'],
-    maxLength: [100, 'Review user mush have more or equal then 100 characters'],
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
     required: [true, 'Review must have a user'],
+    validate: {
+      // check user exist or not
+      validator: function (el) {
+        return userModel.exists({ _id: el });
+      },
+      message: 'User ID not found ',
+    },
   },
 });
 
