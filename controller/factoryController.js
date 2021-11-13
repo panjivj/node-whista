@@ -1,4 +1,5 @@
 const AppError = require('../helper/AppError');
+const ApiFeatures = require('../helper/ApiFeatures');
 const { catchAsync } = require('../helper/catchAsync');
 
 const response = (res, doc, statusCode) => {
@@ -25,8 +26,14 @@ exports.getOneById = (Model) =>
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
-    const doc = await Model.find();
-    response(res, doc, 200);
+    const queryBuild = new ApiFeatures(Model, req.query).filter();
+    const doc = await queryBuild.query;
+
+    res.status(200).json({
+      status: 'success',
+      records: Object.keys(doc).length,
+      data: doc,
+    });
   });
 
 exports.updateById = (Model) =>
