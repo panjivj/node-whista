@@ -8,6 +8,8 @@ class ApiFeatures {
     this.query = this.query.find(this.queryReq);
     return this;
   }
+
+  //TODO: ADD SORT, PAGINATION, FIELDS
 }
 
 module.exports = ApiFeatures;
