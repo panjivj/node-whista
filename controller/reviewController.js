@@ -6,7 +6,6 @@ const { filterObj } = require('../helper/utils');
 exports.createReview = factory.create(Review);
 exports.deleteReview = factory.deleteById(Review);
 exports.getReview = factory.getOneById(Review);
-exports.getReviews = factory.getAll(Review);
 
 exports.updateReview = catchAsync(async (req, res, next) => {
   // only update field title, content and rating
