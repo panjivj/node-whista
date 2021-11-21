@@ -8,5 +8,4 @@ router
   .route('/:id')
   .get(itineraryController.getItinerary)
   .delete(itineraryController.deleteItinerary);
-
 module.exports = router;

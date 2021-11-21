@@ -19,7 +19,9 @@ exports.create = (Model) =>
 
 exports.getOneById = (Model) =>
   catchAsync(async (req, res, next) => {
-    const doc = await Model.findById(req.params.id);
+    const modelById = Model.findById(req.params.id);
+    const queryBuild = new ApiFeatures(modelById, req.query).onlyFields();
+    const doc = await queryBuild.query;
     if (!doc) return next(new AppError("Can't find document with that ID", 404));
     response(res, doc, 200);
   });
