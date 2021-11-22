@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
     minLength: [2, 'User name mush have more or equal then 2 characters'],
     maxLength: [100, 'User name mush have more or equal then 100 characters'],
     required: [true, 'User must have a name'],
-    unique: true,
     trim: true,
   },
   email: {
@@ -17,11 +16,12 @@ const userSchema = new mongoose.Schema({
     required: [true, 'User must have a email'],
     trim: true,
     lowercase: true,
+    unique: true,
     validate: [validator.isEmail, 'User mail badly formatted'],
   },
   password: {
     type: String,
-    minLength: [8, 'User password mush have more or equal then 8 characters'],
+    minLength: [4, 'User password mush have more or equal then 4 characters'],
     maxLength: [100, 'User password mush have more or equal then 100 characters'],
     required: [true, 'User must have a password'],
     trim: true,
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    minLength: [8, 'User passwordConfirm mush have more or equal then 8 characters'],
+    minLength: [4, 'User passwordConfirm mush have more or equal then 4 characters'],
     maxLength: [100, 'User passwordConfirm mush have more or equal then 100 characters'],
     required: [true, 'User must have a passwordConfirm'],
     trim: true,

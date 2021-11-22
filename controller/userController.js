@@ -2,7 +2,7 @@ const User = require('../models/userModel');
 const factory = require('./factoryController');
 const { catchAsync } = require('../helper/catchAsync');
 const AppError = require('../helper/AppError');
-const { filterObj } = require('../helper/utils');
+const { filterObj, response } = require('../helper/utils');
 
 exports.createUser = factory.create(User);
 exports.deleteUser = factory.deleteById(User);
@@ -24,5 +24,5 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
-  factory.res(res, doc, 200);
+  response(res, doc, 200);
 });

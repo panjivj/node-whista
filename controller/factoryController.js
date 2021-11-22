@@ -1,15 +1,7 @@
 const AppError = require('../helper/AppError');
 const ApiFeatures = require('../helper/ApiFeatures');
 const { catchAsync } = require('../helper/catchAsync');
-
-const response = (res, doc, statusCode) => {
-  res.status(statusCode).json({
-    status: 'success',
-    data: doc,
-  });
-};
-
-exports.res = response;
+const { response } = require('../helper/utils');
 
 exports.create = (Model) =>
   catchAsync(async (req, res, next) => {

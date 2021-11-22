@@ -1,7 +1,7 @@
 const { catchAsync } = require('../helper/catchAsync');
 const Review = require('../models/reviewModel');
 const factory = require('./factoryController');
-const { filterObj } = require('../helper/utils');
+const { filterObj, response } = require('../helper/utils');
 
 exports.createReview = factory.create(Review);
 exports.deleteReview = factory.deleteById(Review);
@@ -16,5 +16,5 @@ exports.updateReview = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
-  factory.res(res, doc, 200);
+  response(res, doc, 200);
 });

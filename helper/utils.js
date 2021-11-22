@@ -8,6 +8,14 @@ const filterObj = (obj, ...allowed) => {
   return newObj;
 };
 
+const response = (res, doc, statusCode) => {
+  res.status(statusCode).json({
+    status: 'success',
+    data: doc,
+  });
+};
+
 module.exports = {
   filterObj,
+  response,
 };
