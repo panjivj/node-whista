@@ -27,7 +27,7 @@ app.use(`${process.env.API_VERSION}/auth`, authRouter);
 // app.use('/api/v1/reviews');
 
 app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  next(new AppError(`Can't find url ${req.originalUrl} on this server!`, 404));
 });
 
 app.use(errorHandler);

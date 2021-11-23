@@ -60,5 +60,11 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.post('save', (doc, next) => {
+  doc.password = 'undefined';
+  doc.passwordConfirm = 'undefined';
+  next();
+});
+
 const User = mongoose.model('User', userSchema);
 module.exports = User;
