@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema({
     required: [true, 'User must have a email'],
     trim: true,
     lowercase: true,
-    unique: true,
     validate: [validator.isEmail, 'User mail badly formatted'],
   },
   password: {
@@ -58,12 +57,6 @@ const userSchema = new mongoose.Schema({
     default: true,
     select: false,
   },
-});
-
-userSchema.post('save', (doc, next) => {
-  doc.password = 'undefined';
-  doc.passwordConfirm = 'undefined';
-  next();
 });
 
 const User = mongoose.model('User', userSchema);

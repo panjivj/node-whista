@@ -8,6 +8,14 @@ const filterObj = (obj, ...allowed) => {
   return newObj;
 };
 
+const filterRemoveObj = (obj, ...removed) => {
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (!removed.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
+
 const response = (res, doc, statusCode) => {
   res.status(statusCode).json({
     status: 'success',
@@ -17,5 +25,6 @@ const response = (res, doc, statusCode) => {
 
 module.exports = {
   filterObj,
+  filterRemoveObj,
   response,
 };
