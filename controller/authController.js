@@ -26,6 +26,10 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!token) return next(new AppError('Token empty or use bearer token', 403));
 
   const decoded = await decodedToken(token);
-  console.log(decoded);
-  res.end('end');
+
+  const checkUserExist = await User.findById(decoded.id);
+  if (!checkUserExist) return next(new AppError('User not exist', 403));
+
+  req.user = checkUserExist;
+  next();
 });
