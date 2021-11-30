@@ -1,4 +1,3 @@
-// const { promisify } = require('util');
 const User = require('../models/userModel');
 const { catchAsync } = require('../helper/catchAsync');
 const { filterObj, filterRemoveObj, response } = require('../helper/utils');
@@ -33,3 +32,12 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = checkUserExist;
   next();
 });
+
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError('You do not have permission', 403));
+    }
+    next();
+  };
