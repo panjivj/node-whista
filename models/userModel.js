@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -16,6 +18,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'User must have a email'],
     trim: true,
     lowercase: true,
+    unique: true,
     validate: [validator.isEmail, 'User mail badly formatted'],
   },
   password: {
@@ -57,14 +60,26 @@ const userSchema = new mongoose.Schema({
     default: true,
     select: false,
   },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
-userSchema.pre('save', function (next) {
-  if (this.isModified('password')) {
-    console.log('edited');
-  }
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
   next();
 });
+
+userSchema.methods.examinePassword = async function (newPassword, oldPassword) {
+  return await bcrypt.compare(newPassword, oldPassword);
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  console.log(resetToken);
+};
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
