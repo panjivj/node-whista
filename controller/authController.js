@@ -3,6 +3,7 @@ const { catchAsync } = require('../helper/catchAsync');
 const { filterObj, filterRemoveObj, response } = require('../helper/utils');
 const { issueToken, decodedToken } = require('../helper/jwt');
 const AppError = require('../helper/AppError');
+const { sendEmail } = require('../helper/email');
 
 exports.signUp = catchAsync(async (req, res, next) => {
   const filters = filterObj(req.body, 'name', 'email', 'password', 'passwordConfirm');
@@ -22,7 +23,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!email || !password)
     return next(new AppError('Please provide name and password', 400));
 
-  const foundUser = await User.findOne({ email: email }).select('+password');
+  const foundUser = await User.findOne({ email }).select('+password');
   if (!foundUser || !(await foundUser.examinePassword(password, foundUser.password)))
     return next(new AppError('Incorrect email or password', 401));
 
@@ -55,4 +56,32 @@ exports.restrictTo =
     next();
   };
 
-exports.forgotPassword = catchAsync(async (req, res, next) => {});
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) return next(new AppError('Please provide email', 400));
+
+  const foundUser = await User.findOne({ email });
+  if (!foundUser) return next(new AppError('User does not exist', 400));
+
+  const resetToken = foundUser.generatePasswordResetToken();
+  await foundUser.save();
+
+  const resetURL = `${req.protocol}://${req.get(
+    'host',
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  try {
+    await sendEmail({
+      email: email,
+      subject: 'Password reset token (valid for 15 min)',
+      message: `${resetURL}`,
+    });
+    response(res, { message: 'Token send to email' }, 200);
+  } catch (error) {
+    foundUser.passwordResetToken = undefined;
+    foundUser.passwordResetExpires = undefined;
+    await foundUser.save();
+
+    return next(new AppError('Error sending the email', 500));
+  }
+});

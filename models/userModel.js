@@ -76,9 +76,15 @@ userSchema.methods.examinePassword = async function (newPassword, oldPassword) {
   return await bcrypt.compare(newPassword, oldPassword);
 };
 
-userSchema.methods.createPasswordResetToken = function () {
+userSchema.methods.generatePasswordResetToken = function () {
+  // generate random string and hash it
   const resetToken = crypto.randomBytes(32).toString('hex');
-  console.log(resetToken);
+  const encryptResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  this.passwordResetToken = encryptResetToken;
+  this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);
