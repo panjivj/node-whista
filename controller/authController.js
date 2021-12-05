@@ -1,6 +1,11 @@
 const User = require('../models/userModel');
 const { catchAsync } = require('../helper/catchAsync');
-const { filterObj, filterRemoveObj, response } = require('../helper/utils');
+const {
+  filterObj,
+  filterRemoveObj,
+  response,
+  createHashHex,
+} = require('../helper/utils');
 const { issueToken, decodedToken } = require('../helper/jwt');
 const AppError = require('../helper/AppError');
 const { sendEmail } = require('../helper/email');
@@ -43,6 +48,9 @@ exports.protect = catchAsync(async (req, res, next) => {
   const checkUserExist = await User.findById(decoded.id);
   if (!checkUserExist) return next(new AppError('User not exist', 400));
 
+  if (!checkUserExist.passwordChangeAfter(decoded.iat))
+    return next(new AppError('User recently changed password, Please relogin', 401));
+
   req.user = checkUserExist;
   next();
 });
@@ -66,15 +74,15 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = foundUser.generatePasswordResetToken();
   await foundUser.save();
 
-  const resetURL = `${req.protocol}://${req.get(
-    'host',
-  )}/api/v1/users/resetPassword/${resetToken}`;
+  const resetURL = `${req.protocol}://${req.get('host')}${
+    process.env.API_VERSION
+  }/users/resetPassword/${resetToken}`;
 
   try {
     await sendEmail({
       email: email,
-      subject: 'Password reset token (valid for 15 min)',
-      message: `${resetURL}`,
+      subject: 'Password reset token (valid for 10 min)',
+      message: `Submit a PATCH request with your new password and passwordConfirm to ${resetURL}`,
     });
     response(res, { message: 'Token send to email' }, 200);
   } catch (error) {
@@ -82,6 +90,39 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     foundUser.passwordResetExpires = undefined;
     await foundUser.save();
 
-    return next(new AppError('Error sending the email', 500));
+    return next(new AppError('There was an error sending the email', 500));
   }
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const { password, passwordConfirm } = req.body;
+  if (!password || !passwordConfirm)
+    return next('Please provide email and password', 400);
+
+  const getHashedToken = createHashHex('sha256', req.params.token);
+  const foundUser = await User.findOne({
+    passwordResetToken: getHashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  if (!foundUser) return next(new AppError('Token invalid or expired', 400));
+
+  foundUser.password = password;
+  foundUser.passwordConfirm = passwordConfirm;
+  await foundUser.save();
+
+  response(res, { token: issueToken(foundUser.id) }, 200);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const foundUser = await User.findById(req.user.id).select('+password');
+  if (!foundUser) return next(new AppError('User not found'));
+
+  if (!(await foundUser.examinePassword(req.body.passwordCurrent, foundUser.password)))
+    return next(new AppError('Your current password is wrong'), 400);
+
+  foundUser.password = req.body.password;
+  foundUser.passwordConfirm = req.body.passwordConfirm;
+  await foundUser.save();
+
+  response(res, { message: 'The password has been updated' }, 200);
 });
