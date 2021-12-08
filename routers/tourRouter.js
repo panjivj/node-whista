@@ -1,12 +1,17 @@
 const express = require('express');
 const tourController = require('../controller/tourController');
-// const authController = require('../controller/authController');
+const authController = require('../controller/authController');
 
 const router = express.Router();
 
-// router.use(authController.protect);
-
-router.route('/').get(tourController.getTours).post(tourController.createTour);
+router
+  .route('/')
+  .get(tourController.getTours)
+  .post(
+    authController.protect,
+    authController.restrictTo('admin'),
+    tourController.createTour,
+  );
 router
   .route('/:id')
   .get(tourController.getTour)

@@ -41,14 +41,20 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
-  if (!token) return next(new AppError('Token empty or use bearer token', 400));
+  if (!token)
+    return next(
+      new AppError(
+        'You are trying to request protected content! please use your credentials',
+        403,
+      ),
+    );
 
   const decoded = await decodedToken(token);
 
   const checkUserExist = await User.findById(decoded.id);
   if (!checkUserExist) return next(new AppError('User not exist', 400));
 
-  if (!checkUserExist.passwordChangeAfter(decoded.iat))
+  if (!checkUserExist.isTokenIssuedAfterPasswordChange(decoded.iat))
     return next(new AppError('User recently changed password, Please relogin', 401));
 
   req.user = checkUserExist;
@@ -59,7 +65,7 @@ exports.restrictTo =
   (...roles) =>
   (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return next(new AppError('You do not have permission', 403));
+      return next(new AppError("You don't have access permission", 403));
     }
     next();
   };

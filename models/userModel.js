@@ -95,11 +95,11 @@ userSchema.methods.generatePasswordResetToken = function () {
   return resetToken;
 };
 
-userSchema.methods.passwordChangeAfter = function (JWTTimestamp) {
+userSchema.methods.isTokenIssuedAfterPasswordChange = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     return JWTTimestamp > this.passwordChangedAt.getTime() / 1000;
   }
-  return false;
+  return true;
 };
 
 const User = mongoose.model('User', userSchema);
