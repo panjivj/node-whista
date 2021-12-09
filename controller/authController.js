@@ -6,7 +6,13 @@ const {
   response,
   createHashHex,
 } = require('../helper/utils');
-const { issueToken, decodedToken } = require('../helper/jwt');
+const {
+  issueAccessToken,
+  decodedAccessToken,
+  issueRefreshToken,
+  // decodedRefreshToken,
+  responseAuth,
+} = require('../helper/jwt');
 const AppError = require('../helper/AppError');
 const { sendEmail } = require('../helper/email');
 
@@ -18,7 +24,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     'password',
     'passwordConfirm',
   );
-  const token = issueToken(filtersRemove._id);
+  const token = issueAccessToken(filtersRemove._id);
   filtersRemove.token = token;
   response(res, filtersRemove, 201);
 });
@@ -32,8 +38,10 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!foundUser || !(await foundUser.examinePassword(password, foundUser.password)))
     return next(new AppError('Incorrect email or password', 401));
 
-  const token = issueToken(foundUser.id);
-  response(res, { token: token }, 200);
+  const accessToken = issueAccessToken(foundUser.id);
+  const refreshToken = issueRefreshToken(foundUser.id);
+
+  responseAuth(res, accessToken, refreshToken, 200);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -49,7 +57,7 @@ exports.protect = catchAsync(async (req, res, next) => {
       ),
     );
 
-  const decoded = await decodedToken(token);
+  const decoded = await decodedAccessToken(token);
 
   const checkUserExist = await User.findById(decoded.id);
   if (!checkUserExist) return next(new AppError('User not exist', 400));
@@ -57,7 +65,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!checkUserExist.isTokenIssuedAfterPasswordChange(decoded.iat))
     return next(new AppError('User recently changed password, Please relogin', 401));
 
-  req.user = checkUserExist;
+  req.authUser = checkUserExist;
   next();
 });
 
@@ -116,11 +124,11 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   foundUser.passwordConfirm = passwordConfirm;
   await foundUser.save();
 
-  response(res, { token: issueToken(foundUser.id) }, 200);
+  response(res, { token: issueAccessToken(foundUser.id) }, 200);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  const foundUser = await User.findById(req.user.id).select('+password');
+  const foundUser = await User.findById(req.authUser.id).select('+password');
   if (!foundUser) return next(new AppError('User not found'));
 
   if (!(await foundUser.examinePassword(req.body.passwordCurrent, foundUser.password)))
