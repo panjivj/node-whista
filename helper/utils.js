@@ -20,7 +20,7 @@ const filterRemoveObj = (obj, ...removed) => {
 const response = (res, doc, statusCode) => {
   res.status(statusCode).json({
     status: 'success',
-    data: doc,
+    content: doc,
   });
 };
 

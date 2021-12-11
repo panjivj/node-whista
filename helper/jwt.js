@@ -30,7 +30,7 @@ const responseAuth = (res, accessToken, refreshToken, statusCode) => {
 
   res.status(statusCode).json({
     status: 'success',
-    data: {
+    content: {
       token: accessToken,
     },
   });
