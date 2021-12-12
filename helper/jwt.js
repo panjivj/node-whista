@@ -24,6 +24,8 @@ const responseAuth = (res, accessToken, refreshToken, statusCode) => {
     ),
     secure: true,
     httpOnly: true,
+    path: '/',
+    sameSite: 'none',
   };
 
   res.cookie('refresh', refreshToken, cookieOptions);

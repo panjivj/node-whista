@@ -10,11 +10,11 @@ const {
   issueAccessToken,
   decodedAccessToken,
   issueRefreshToken,
-  // decodedRefreshToken,
+  decodedRefreshToken,
   responseAuth,
 } = require('../helper/jwt');
 const AppError = require('../helper/AppError');
-const { sendEmail } = require('../helper/email');
+const { sendEmail } = require('../helper/configs');
 
 exports.signUp = catchAsync(async (req, res, next) => {
   const filters = filterObj(req.body, 'name', 'email', 'password', 'passwordConfirm');
@@ -34,13 +34,21 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!email || !password)
     return next(new AppError('Please provide name and password', 400));
 
-  const foundUser = await User.findOne({ email }).select('+password');
-  if (!foundUser || !(await foundUser.examinePassword(password, foundUser.password)))
+  const currentUser = await User.findOne({ email }).select('+password');
+  if (
+    !currentUser ||
+    !(await currentUser.examinePassword(password, currentUser.password))
+  )
     return next(new AppError('Incorrect email or password', 401));
 
-  const accessToken = issueAccessToken(foundUser.id);
-  const refreshToken = issueRefreshToken(foundUser.id);
-
+  const accessToken = issueAccessToken(currentUser.id);
+  const refreshToken = issueRefreshToken(currentUser.id);
+  const token = {
+    token: refreshToken,
+  };
+  await User.findByIdAndUpdate(currentUser.id, {
+    $addToSet: { refreshToken: token },
+  });
   responseAuth(res, accessToken, refreshToken, 200);
 });
 
@@ -82,11 +90,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
   if (!email) return next(new AppError('Please provide email', 400));
 
-  const foundUser = await User.findOne({ email });
-  if (!foundUser) return next(new AppError('User does not exist', 400));
+  const currentUser = await User.findOne({ email });
+  if (!currentUser) return next(new AppError('User does not exist', 400));
 
-  const resetToken = foundUser.generatePasswordResetToken();
-  await foundUser.save();
+  const resetToken = currentUser.generatePasswordResetToken();
+  await currentUser.save();
 
   const resetURL = `${req.protocol}://${req.get('host')}${
     process.env.API_VERSION
@@ -100,9 +108,9 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     });
     response(res, { message: 'Token send to email' }, 200);
   } catch (error) {
-    foundUser.passwordResetToken = undefined;
-    foundUser.passwordResetExpires = undefined;
-    await foundUser.save();
+    currentUser.passwordResetToken = undefined;
+    currentUser.passwordResetExpires = undefined;
+    await currentUser.save();
 
     return next(new AppError('There was an error sending the email', 500));
   }
@@ -114,29 +122,43 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     return next('Please provide email and password', 400);
 
   const getHashedToken = createHashHex('sha256', req.params.token);
-  const foundUser = await User.findOne({
+  const currentUser = await User.findOne({
     passwordResetToken: getHashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
-  if (!foundUser) return next(new AppError('Token invalid or expired', 400));
+  if (!currentUser) return next(new AppError('Token invalid or expired', 400));
 
-  foundUser.password = password;
-  foundUser.passwordConfirm = passwordConfirm;
-  await foundUser.save();
+  currentUser.password = password;
+  currentUser.passwordConfirm = passwordConfirm;
+  await currentUser.save();
 
-  response(res, { token: issueAccessToken(foundUser.id) }, 200);
+  response(res, { token: issueAccessToken(currentUser.id) }, 200);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  const foundUser = await User.findById(req.authUser.id).select('+password');
-  if (!foundUser) return next(new AppError('User not found'));
+  const currentUser = await User.findById(req.authUser.id).select('+password');
+  if (!currentUser) return next(new AppError('User not found', 400));
 
-  if (!(await foundUser.examinePassword(req.body.passwordCurrent, foundUser.password)))
+  if (
+    !(await currentUser.examinePassword(req.body.passwordCurrent, currentUser.password))
+  )
     return next(new AppError('Your current password is wrong'), 400);
 
-  foundUser.password = req.body.password;
-  foundUser.passwordConfirm = req.body.passwordConfirm;
-  await foundUser.save();
+  currentUser.password = req.body.password;
+  currentUser.passwordConfirm = req.body.passwordConfirm;
+  await currentUser.save();
 
   response(res, { message: 'The password has been updated' }, 200);
+});
+
+exports.refresh = catchAsync(async (req, res, next) => {
+  if (!req.headers.cookie || !req.headers.cookie.startsWith('refresh=')) {
+    return next(new AppError('Please use your credentials cookie', 401));
+  }
+  const refreshToken = req.headers.cookie.substring(8);
+  const decodedRefresh = await decodedRefreshToken(refreshToken);
+  // const foundToken = await User.findById(decodedRefresh.id);
+
+  const newAccessToken = issueAccessToken(decodedRefresh.id);
+  response(res, { token: newAccessToken }, 200);
 });

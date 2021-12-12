@@ -30,7 +30,7 @@ exports.getAll = (Model) =>
     res.status(200).json({
       status: 'success',
       records: doc.length,
-      data: doc,
+      content: doc,
     });
   });
 

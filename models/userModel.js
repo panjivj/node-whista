@@ -64,6 +64,19 @@ const userSchema = new mongoose.Schema({
   passwordResetToken: String,
   passwordResetExpires: Date,
   passwordChangedAt: Date,
+  refreshToken: {
+    type: [
+      {
+        token: {
+          type: String,
+          required: [true, 'RefreshToken must have token'],
+          trim: true,
+          maxlength: [500, 'RefreshToken must have less or equal then 300 characters'],
+          minlength: [500, 'RefreshToken must have less or equal then 10 characters'],
+        },
+      },
+    ],
+  },
 });
 
 userSchema.pre('save', async function (next) {

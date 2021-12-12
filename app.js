@@ -8,12 +8,13 @@ const reviewRouter = require('./routers/reviewRouter');
 const itineraryRouter = require('./routers/itineraryRouter');
 const authRouter = require('./routers/authRouter');
 const errorHandler = require('./helper/errorHandler');
+const { corsConfig } = require('./helper/configs');
 
 const app = express();
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-app.use(cors());
+app.use(cors(corsConfig));
 app.use(express.json({ limit: '20kb' }));
 
 app.use('/status', (req, res) => {
