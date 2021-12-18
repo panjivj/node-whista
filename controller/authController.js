@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const RefreshToken = require('../models/refreshTokenModel');
 const { catchAsync } = require('../helper/catchAsync');
 const {
   filterObj,
@@ -12,6 +13,7 @@ const {
   issueRefreshToken,
   decodedRefreshToken,
   responseAuth,
+  saveRefreshToken,
 } = require('../helper/jwt');
 const AppError = require('../helper/AppError');
 const { sendEmail } = require('../helper/configs');
@@ -24,9 +26,18 @@ exports.signUp = catchAsync(async (req, res, next) => {
     'password',
     'passwordConfirm',
   );
-  const token = issueAccessToken(filtersRemove._id);
-  filtersRemove.token = token;
-  response(res, filtersRemove, 201);
+
+  const access = issueAccessToken(filtersRemove._id);
+  const refresh = issueRefreshToken(filtersRemove._id);
+
+  const result = await saveRefreshToken(
+    filtersRemove._id,
+    process.env.REFRESH_JWT_EXPIRES_IN,
+    refresh,
+    RefreshToken,
+  );
+  if (result.errors) return next(new AppError(result.message, 500));
+  responseAuth(res, access, result.token, 200);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -44,17 +55,14 @@ exports.login = catchAsync(async (req, res, next) => {
   const accessToken = issueAccessToken(currentUser.id);
   const newRefreshToken = issueRefreshToken(currentUser.id);
 
-  const resultUpdate = await User.updateOne(
-    { _id: currentUser.id },
-    {
-      $addToSet: { refreshToken: [{ token: newRefreshToken }] },
-    },
+  const result = await saveRefreshToken(
+    currentUser.id,
+    process.env.REFRESH_JWT_EXPIRES_IN,
+    newRefreshToken,
+    RefreshToken,
   );
-  if (resultUpdate.modifiedCount < 1)
-    return next(
-      new AppError('Unable to issue token due to failure when trying to save it', 500),
-    );
-  responseAuth(res, accessToken, newRefreshToken, 200);
+  if (result.errors) return next(new AppError(result.message, 500));
+  responseAuth(res, accessToken, result.token, 200);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
