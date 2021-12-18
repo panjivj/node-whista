@@ -42,14 +42,19 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
 
   const accessToken = issueAccessToken(currentUser.id);
-  const refreshToken = issueRefreshToken(currentUser.id);
-  const token = {
-    token: refreshToken,
-  };
-  await User.findByIdAndUpdate(currentUser.id, {
-    $addToSet: { refreshToken: token },
-  });
-  responseAuth(res, accessToken, refreshToken, 200);
+  const newRefreshToken = issueRefreshToken(currentUser.id);
+
+  const resultUpdate = await User.updateOne(
+    { _id: currentUser.id },
+    {
+      $addToSet: { refreshToken: [{ token: newRefreshToken }] },
+    },
+  );
+  if (resultUpdate.modifiedCount < 1)
+    return next(
+      new AppError('Unable to issue token due to failure when trying to save it', 500),
+    );
+  responseAuth(res, accessToken, newRefreshToken, 200);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {

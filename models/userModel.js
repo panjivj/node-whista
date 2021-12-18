@@ -69,15 +69,19 @@ const userSchema = new mongoose.Schema({
       {
         token: {
           type: String,
-          required: [true, 'RefreshToken must have token'],
+          required: [true, 'RefreshToken must have token value'],
           trim: true,
           maxlength: [500, 'RefreshToken must have less or equal then 300 characters'],
           minlength: [500, 'RefreshToken must have less or equal then 10 characters'],
         },
+        expireAt: { type: Date, default: new Date() },
       },
     ],
+    index: true,
   },
 });
+
+userSchema.index({ refreshToken: { expireAt: 1 } }, { expireAfterSeconds: 30 });
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
