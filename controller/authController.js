@@ -170,7 +170,16 @@ exports.refresh = catchAsync(async (req, res, next) => {
   }
   const refreshToken = req.headers.cookie.substring(8);
   const decodedRefresh = await decodedRefreshToken(refreshToken);
-  // const foundToken = await User.findById(decodedRefresh.id);
+  const checkRefreshToken = await RefreshToken.findOne(
+    { token: refreshToken },
+    { user: 1 },
+  );
+  if (!checkRefreshToken)
+    return next(new AppError('Invalid token, please re-login'), 401);
+
+  const checkUser = decodedRefresh.id === checkRefreshToken.user.valueOf();
+
+  if (!checkUser) return next(new AppError('Invalid token, please re-login'), 401);
 
   const newAccessToken = issueAccessToken(decodedRefresh.id);
   response(res, { token: newAccessToken }, 200);
