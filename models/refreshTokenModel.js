@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const userModel = require('./userModel');
+// const userModel = require('./userModel');
 
 const refreshTokenSchema = new mongoose.Schema({
   token: {
@@ -14,13 +14,13 @@ const refreshTokenSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: [true, 'Token must have a user'],
-    validate: {
-      // check user exist or not
-      validator: function (el) {
-        return userModel.exists({ _id: el });
-      },
-      message: 'User ID not found ',
-    },
+    // validate: {
+    //   // check user exist or not
+    //   validator: function (el) {
+    //     return userModel.exists({ _id: el });
+    //   },
+    //   message: 'User ID not found ',
+    // },
   },
 });
 

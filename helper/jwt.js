@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
-const User = require('../models/userModel');
 
 const issueAccessToken = (id) =>
   jwt.sign({ id }, process.env.ACCESS_JWT_SECRET, {
@@ -39,26 +38,10 @@ const responseAuth = (res, accessToken, refreshToken, statusCode) => {
   });
 };
 
-const saveRefreshToken = async (userId, expireIn, token, RefreshTokenModel) => {
-  const timeInS = Date.now() + expireIn * 1;
-  const objSave = {
-    user: userId,
-    token: token,
-    expireAt: timeInS,
-  };
-  try {
-    return await RefreshTokenModel.create(objSave);
-  } catch (error) {
-    await User.deleteOne({ id: userId });
-    return error;
-  }
-};
-
 module.exports = {
   issueAccessToken,
   decodedAccessToken,
   issueRefreshToken,
   decodedRefreshToken,
   responseAuth,
-  saveRefreshToken,
 };

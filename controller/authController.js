@@ -1,43 +1,38 @@
+const mongoose = require('mongoose');
 const User = require('../models/userModel');
 const RefreshToken = require('../models/refreshTokenModel');
-const { catchAsync } = require('../helper/catchAsync');
-const {
-  filterObj,
-  filterRemoveObj,
-  response,
-  createHashHex,
-} = require('../helper/utils');
+const { catchAsync, catchAsyncFinally } = require('../helper/catchAsync');
+const { filterObj, response, createHashHex } = require('../helper/utils');
 const {
   issueAccessToken,
   decodedAccessToken,
   issueRefreshToken,
   decodedRefreshToken,
   responseAuth,
-  saveRefreshToken,
 } = require('../helper/jwt');
 const AppError = require('../helper/AppError');
 const { sendEmail } = require('../helper/configs');
 
-exports.signUp = catchAsync(async (req, res, next) => {
-  const filters = filterObj(req.body, 'name', 'email', 'password', 'passwordConfirm');
-  const createdUser = await User.create(filters);
-  const filtersRemove = filterRemoveObj(
-    createdUser.toObject(),
-    'password',
-    'passwordConfirm',
-  );
+exports.signUp = catchAsyncFinally(async (req, res, next) => {
+  const session = await mongoose.startSession();
+  res.fnFinally = async () => await session.endSession();
 
-  const access = issueAccessToken(filtersRemove._id);
-  const refresh = issueRefreshToken(filtersRemove._id);
+  await session.withTransaction(async () => {
+    const filters = filterObj(req.body, 'name', 'email', 'password', 'passwordConfirm');
+    const createdUser = await User.create([filters], { session: session });
 
-  const result = await saveRefreshToken(
-    filtersRemove._id,
-    process.env.REFRESH_JWT_EXPIRES_IN,
-    refresh,
-    RefreshToken,
-  );
-  if (result.errors) return next(new AppError(result.message, 500));
-  responseAuth(res, access, result.token, 200);
+    const access = issueAccessToken(createdUser[0].id);
+    const refresh = issueRefreshToken(createdUser[0].id);
+
+    const timeInS = Date.now() + process.env.REFRESH_JWT_EXPIRES_IN * 1;
+    const objSave = {
+      user: createdUser[0].id,
+      token: refresh,
+      expireAt: timeInS,
+    };
+    await RefreshToken.create(objSave);
+    responseAuth(res, access, refresh, 200);
+  });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -55,14 +50,14 @@ exports.login = catchAsync(async (req, res, next) => {
   const accessToken = issueAccessToken(currentUser.id);
   const newRefreshToken = issueRefreshToken(currentUser.id);
 
-  const result = await saveRefreshToken(
-    currentUser.id,
-    process.env.REFRESH_JWT_EXPIRES_IN,
-    newRefreshToken,
-    RefreshToken,
-  );
-  if (result.errors) return next(new AppError(result.message, 500));
-  responseAuth(res, accessToken, result.token, 200);
+  const timeInS = Date.now() + process.env.REFRESH_JWT_EXPIRES_IN * 1;
+  const objSave = {
+    user: currentUser.id,
+    token: newRefreshToken,
+    expireAt: timeInS,
+  };
+  await RefreshToken.create(objSave);
+  responseAuth(res, accessToken, newRefreshToken, 200);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
