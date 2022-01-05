@@ -9,6 +9,7 @@ const {
   issueRefreshToken,
   decodedRefreshToken,
   responseAuth,
+  responseRefreshFail,
 } = require('../helper/jwt');
 const AppError = require('../helper/AppError');
 const { sendEmail } = require('../helper/configs');
@@ -161,7 +162,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
 exports.refresh = catchAsync(async (req, res, next) => {
   if (!req.headers.cookie || !req.headers.cookie.startsWith('refresh=')) {
-    return next(new AppError('Please use your credentials cookie', 401));
+    return responseRefreshFail(res, 'Please use your credentials', 204);
   }
   const refreshToken = req.headers.cookie.substring(8);
   const decodedRefresh = await decodedRefreshToken(refreshToken);
@@ -170,11 +171,11 @@ exports.refresh = catchAsync(async (req, res, next) => {
     { user: 1 },
   );
   if (!checkRefreshToken)
-    return next(new AppError('Invalid token, please re-login'), 401);
+    return responseRefreshFail(res, 'Invalid token, please re-login', 204);
 
   const checkUser = decodedRefresh.id === checkRefreshToken.user.valueOf();
 
-  if (!checkUser) return next(new AppError('Invalid token, please re-login'), 401);
+  if (!checkUser) return responseRefreshFail(res, 'User does not exist', 204);
 
   const newAccessToken = issueAccessToken(decodedRefresh.id);
   response(res, { token: newAccessToken }, 200);

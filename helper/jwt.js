@@ -38,10 +38,18 @@ const responseAuth = (res, accessToken, refreshToken, statusCode) => {
   });
 };
 
+const responseRefreshFail = (res, doc, statusCode) => {
+  res.status(statusCode).json({
+    status: 'fail',
+    content: doc,
+  });
+};
+
 module.exports = {
   issueAccessToken,
   decodedAccessToken,
   issueRefreshToken,
   decodedRefreshToken,
   responseAuth,
+  responseRefreshFail,
 };
