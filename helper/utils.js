@@ -24,6 +24,11 @@ const response = (res, doc, statusCode) => {
   });
 };
 
+const convertRp = (money) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(
+    money * 1,
+  );
+
 const createHashHex = (hashAlgo, willbeHashed) =>
   crypto.createHash(hashAlgo).update(willbeHashed).digest('hex');
 
@@ -32,4 +37,5 @@ module.exports = {
   filterRemoveObj,
   response,
   createHashHex,
+  convertRp,
 };

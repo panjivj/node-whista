@@ -26,10 +26,12 @@ exports.getAll = (Model) =>
       .pagination()
       .onlyFields();
     const doc = await queryBuild.query;
+    const count = await Model.count();
 
     res.status(200).json({
       status: 'success',
       records: doc.length,
+      totalRecords: count,
       content: doc,
     });
   });

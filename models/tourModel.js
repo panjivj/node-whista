@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+// const { convertRp } = require('../helper/utils');
 
 const tourSchema = new mongoose.Schema({
   name: {
@@ -81,6 +82,13 @@ const tourSchema = new mongoose.Schema({
     type: [String],
   },
 });
+
+// tourSchema.post(/^find/, (doc, next) => {
+//   doc.forEach((element) => {
+//     element.price = convertRp(element.price);
+//   });
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
