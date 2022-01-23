@@ -21,11 +21,8 @@ const tourSchema = new mongoose.Schema({
     type: String,
     required: [true, 'A tour must have description'],
     trim: true,
-    maxlength: [
-      10000,
-      'A tour description must have less or equal then 10000 characters',
-    ],
-    minlength: [10, 'A tour description must have more or equal then 10 characters '],
+    maxlength: [5000, 'A tour description must have less or equal then 5000 characters'],
+    minlength: [20, 'A tour description must have more or equal then 10 characters '],
   },
   imageThumbnail: {
     type: String,
