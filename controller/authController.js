@@ -89,7 +89,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 exports.restrictTo =
   (...roles) =>
   (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(req.authUser.role)) {
       return next(new AppError("You don't have access permission", 403));
     }
     next();
@@ -115,7 +115,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       subject: 'Password reset token (valid for 10 min)',
       message: `Submit a PATCH request with your new password and passwordConfirm to ${resetURL}`,
     });
-    response(res, { message: 'Token send to email' }, 200);
+    response(res, { message: 'Reset token has been sent to email' }, 200);
   } catch (error) {
     currentUser.passwordResetToken = undefined;
     currentUser.passwordResetExpires = undefined;

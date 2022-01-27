@@ -9,6 +9,7 @@ const itineraryRouter = require('./routers/itineraryRouter');
 const authRouter = require('./routers/authRouter');
 const errorHandler = require('./helper/errorHandler');
 const { corsConfig } = require('./helper/configs');
+const { multerMiddleware } = require('./helper/middleware');
 
 const app = express();
 if (process.env.NODE_ENV === 'development') {
@@ -16,6 +17,8 @@ if (process.env.NODE_ENV === 'development') {
 }
 app.use(cors(corsConfig));
 app.use(express.json({ limit: '20kb' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(multerMiddleware.single('imageThumbnail'));
 
 app.use('/status', (req, res) => {
   res.status(200).json({ data: 'OK' });

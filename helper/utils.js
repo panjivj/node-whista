@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-// take the field that only wanted
+// only take the wanted field
 const filterObj = (obj, ...allowed) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
