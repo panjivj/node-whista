@@ -5,6 +5,7 @@ const { response } = require('../helper/utils');
 
 exports.create = (Model) =>
   catchAsync(async (req, res, next) => {
+    console.log('hiii');
     const doc = await Model.create(req.body);
     response(res, doc, 201);
   });

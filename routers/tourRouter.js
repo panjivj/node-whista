@@ -10,6 +10,7 @@ router
   .post(
     authController.protect,
     authController.restrictTo('admin'),
+    tourController.handleImageUpload,
     tourController.createTour,
   );
 router

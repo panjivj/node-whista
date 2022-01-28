@@ -18,7 +18,12 @@ if (process.env.NODE_ENV === 'development') {
 app.use(cors(corsConfig));
 app.use(express.json({ limit: '20kb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(multerMiddleware.single('imageThumbnail'));
+app.use(
+  multerMiddleware.fields([
+    { name: 'imageThumbnail', maxCount: 1 },
+    { name: 'imagePhotos', maxCount: 8 },
+  ]),
+);
 
 app.use('/status', (req, res) => {
   res.status(200).json({ data: 'OK' });
