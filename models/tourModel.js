@@ -25,8 +25,7 @@ const tourSchema = new mongoose.Schema({
     minlength: [20, 'A tour description must have more or equal then 10 characters '],
   },
   imageThumbnail: {
-    type: String,
-    required: [true, 'A tour must have imageThumbnail'],
+    type: [String],
   },
   startDate: {
     type: Date,

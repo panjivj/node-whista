@@ -37,11 +37,25 @@ const convertRp = (money) =>
 const createHashHex = (hashAlgo, willbeHashed) =>
   crypto.createHash(hashAlgo).update(willbeHashed).digest('hex');
 
-const saveImageToStorage = (file) =>
+const setToLowercaseAndDash = (words) => {
+  if (typeof words === 'number') return words;
+  const resultString = words.charAt(0).toUpperCase() + words.slice(1);
+  return resultString
+    .match(/[A-Z][a-z]+|[0-9]+/g)
+    .join('-')
+    .toLowerCase();
+};
+
+const saveImageToStorage = (file, userId, index = 0) =>
   new Promise((resolve, reject) => {
-    const { originalname, buffer } = file;
+    const { fieldname, mimetype, buffer } = file;
+    const extension = mimetype.split('/')[1];
     // Create a new blob in the bucket and upload the file data.
-    const blob = bucket.file(originalname.replace(/ /g, '_')); //regex remove space
+    const blob = bucket.file(
+      `${setToLowercaseAndDash(fieldname)}/${setToLowercaseAndDash(
+        fieldname,
+      )}_${userId}_${index}.${extension}`,
+    ); //file name
     const blobStream = blob.createWriteStream({
       resumable: false,
     });
@@ -65,4 +79,5 @@ module.exports = {
   createHashHex,
   convertRp,
   saveImageToStorage,
+  setToLowercaseAndDash,
 };
