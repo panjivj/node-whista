@@ -46,15 +46,23 @@ const setToLowercaseAndDash = (words) => {
     .toLowerCase();
 };
 
-const saveImageToStorage = (file, userId, index = 0) =>
+const modifyLettersOfText = (text, letterFrom, letterTo) => {
+  if (!text || !letterFrom || !letterTo) return null;
+  const search = letterFrom;
+  const replaceWith = letterTo;
+  return text.split(search).join(replaceWith);
+};
+
+const saveImageToStorage = (file, fullName, index = 0) =>
   new Promise((resolve, reject) => {
+    const nameModify = modifyLettersOfText(fullName, ' ', '-').toLowerCase();
     const { fieldname, mimetype, buffer } = file;
     const extension = mimetype.split('/')[1];
     // Create a new blob in the bucket and upload the file data.
     const blob = bucket.file(
       `${setToLowercaseAndDash(fieldname)}/${setToLowercaseAndDash(
         fieldname,
-      )}_${userId}_${index}.${extension}`,
+      )}_${nameModify}_${index}.${extension}`,
     ); //file name
     const blobStream = blob.createWriteStream({
       resumable: false,
