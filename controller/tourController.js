@@ -18,18 +18,19 @@ exports.handleImageUpload = async (req, res, next) => {
 
   const getFieldnameAndUrl = () =>
     Promise.all(
-      Object.values(req.files).map(async (currentField) => {
-        const url = await uploadAndGetUrl(currentField, imageName);
+      Object.values(req.files).map(async (currentFields) => {
+        const url = await uploadAndGetUrl(currentFields, imageName);
         const object = {};
-        object[currentField[0].fieldname] = url;
+        object[currentFields[0].fieldname] = url;
+        // console.log(object);
         return object;
       }),
     );
 
   const resultUpload = await getFieldnameAndUrl();
 
-  resultUpload.forEach((fielname) => {
-    Object.assign(req.body, fielname);
+  resultUpload.forEach((fieldname) => {
+    Object.assign(req.body, fieldname);
   });
 
   next();

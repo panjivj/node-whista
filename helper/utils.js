@@ -72,7 +72,7 @@ const saveImageToStorage = (file, fullName, index = 0) =>
         const publicUrl = format(
           `https://storage.googleapis.com/${bucket.name}/${blob.name}`,
         );
-        resolve(publicUrl);
+        resolve({ url: publicUrl });
       })
       .on('error', () => {
         reject(new AppError(`Unable to upload image, something went wrong`));

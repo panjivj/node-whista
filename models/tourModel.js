@@ -25,7 +25,14 @@ const tourSchema = new mongoose.Schema({
     minlength: [20, 'A tour description must have more or equal then 10 characters '],
   },
   imageThumbnail: {
-    type: [String],
+    type: [
+      {
+        url: {
+          type: String,
+          required: ['Image Photo must have url'],
+        },
+      },
+    ],
   },
   startDate: {
     type: Date,
@@ -75,7 +82,14 @@ const tourSchema = new mongoose.Schema({
     min: [1, 'price must be have less or equal 1'],
   },
   imagePhotos: {
-    type: [String],
+    type: [
+      {
+        url: {
+          type: String,
+          required: ['Image Photo must have url'],
+        },
+      },
+    ],
   },
 });
 
