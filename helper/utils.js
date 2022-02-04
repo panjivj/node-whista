@@ -34,6 +34,16 @@ const convertRp = (money) =>
     money * 1,
   );
 
+const generateRandomString = (length) => {
+  let result = '';
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i += 1) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 const createHashHex = (hashAlgo, willbeHashed) =>
   crypto.createHash(hashAlgo).update(willbeHashed).digest('hex');
 
@@ -53,7 +63,7 @@ const modifyLettersOfText = (text, letterFrom, letterTo) => {
   return text.split(search).join(replaceWith);
 };
 
-const saveImageToStorage = (file, fullName, index = 0) =>
+const saveImageToStorage = (file, fullName) =>
   new Promise((resolve, reject) => {
     const nameModify = modifyLettersOfText(fullName, ' ', '-').toLowerCase();
     const { fieldname, mimetype, buffer } = file;
@@ -62,7 +72,7 @@ const saveImageToStorage = (file, fullName, index = 0) =>
     const blob = bucket.file(
       `${setToLowercaseAndDash(fieldname)}/${setToLowercaseAndDash(
         fieldname,
-      )}_${nameModify}_${index}.${extension}`,
+      )}_${nameModify}_${generateRandomString(4)}.${extension}`,
     ); //file name
     const blobStream = blob.createWriteStream({
       resumable: false,
@@ -88,4 +98,5 @@ module.exports = {
   convertRp,
   saveImageToStorage,
   setToLowercaseAndDash,
+  generateRandomString,
 };

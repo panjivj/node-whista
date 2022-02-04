@@ -12,9 +12,7 @@ exports.handleImageUpload = async (req, res, next) => {
   const imageName = req.body.name;
 
   const uploadAndGetUrl = (field, userId) =>
-    Promise.all(
-      field.map(async (file, index) => await saveImageToStorage(file, userId, index)),
-    );
+    Promise.all(field.map(async (file) => await saveImageToStorage(file, userId)));
 
   const getFieldnameAndUrl = () =>
     Promise.all(
