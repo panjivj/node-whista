@@ -53,3 +53,27 @@ exports.deleteById = (Model) =>
     // postman doesn't show response body if status is 204
     response(res, doc, 204);
   });
+
+exports.updateImage = (Model) =>
+  catchAsync(async (req, res, next) => {
+    const { id, fieldImage, urlId } = req.params;
+    const fieldNameBuild = `${fieldImage}.$[element].url`;
+    const updateOperator = {
+      $set: { [fieldNameBuild]: 'zee13' },
+    };
+
+    const options = {
+      arrayFilters: [
+        {
+          'element._id': urlId,
+        },
+      ],
+      new: true,
+      runValidators: true,
+      rawResult: true,
+    };
+
+    const resUpdate = await Model.updateOne({ _id: id }, updateOperator, options);
+    if (resUpdate.modifiedCount === 0) return next(new AppError('Failed to update', 400));
+    response(res, 'Updated successfully', 200);
+  });

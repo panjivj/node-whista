@@ -19,4 +19,6 @@ router
   .delete(tourController.deleteTour)
   .patch(tourController.updateTour);
 
+router.route('/:id/:fieldImage/:urlId').patch(tourController.updateImageTour);
+
 module.exports = router;

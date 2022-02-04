@@ -9,6 +9,5 @@ router
   .get(reviewController.getReview)
   .patch(reviewController.updateReview)
   .delete(reviewController.deleteReview);
-router.route('/:id/:fieldImage/:urlId');
 
 module.exports = router;

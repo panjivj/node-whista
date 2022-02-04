@@ -7,6 +7,7 @@ exports.deleteTour = factory.deleteById(Tour);
 exports.getTour = factory.getOneById(Tour);
 exports.getTours = factory.getAll(Tour);
 exports.updateTour = factory.updateById(Tour);
+exports.updateImageTour = factory.updateImage(Tour);
 exports.handleImageUpload = async (req, res, next) => {
   if (!req.files) return next();
   const imageName = req.body.name;
