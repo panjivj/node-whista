@@ -10,7 +10,7 @@ router
   .post(
     authController.protect,
     authController.restrictTo('admin'),
-    tourController.handleImageUpload,
+    tourController.handleUploadImageTour,
     tourController.createTour,
   );
 router
@@ -19,6 +19,8 @@ router
   .delete(tourController.deleteTour)
   .patch(tourController.updateTour);
 
-router.route('/:id/:fieldImage/:urlId').patch(tourController.updateImageTour);
+router
+  .route('/:id/:fieldImage/:urlId')
+  .patch(tourController.handleUploadImageTour, tourController.updateImageTour);
 
 module.exports = router;
